@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div>Hello Conecta</div>
+  return <div>Módulo de reserva de sala</div>
 }

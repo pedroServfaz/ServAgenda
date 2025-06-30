@@ -27,12 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
             <Header />
-            <main className="p-4">{children}</main>
+            <main className="p-6">{children}</main>
           </SidebarInset>
         </SidebarProvider>
       </body>

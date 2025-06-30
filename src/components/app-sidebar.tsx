@@ -1,13 +1,12 @@
 'use client'
 
 import * as React from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-import { LayoutDashboard, LayoutPanelLeft } from 'lucide-react'
+import { LayoutPanelLeft, ListChecks } from 'lucide-react'
 
-import { NavItems } from '@/components/nav-main'
 import { NavFooter } from '@/components/nav-footer'
 import {
   Sidebar,
@@ -32,21 +31,27 @@ const data = {
   },
   apps: [
     {
-      title: 'Application',
-      url: '#',
+      title: 'Reserva de sala',
+      url: '/reserve-room',
       icon: LayoutPanelLeft,
       isActive: true,
     },
   ],
-  navApps: [{ icon: LayoutDashboard, name: 'Item Navigation', url: '/' }],
+  navApps: [
+    {
+      icon: ListChecks,
+      name: 'Criadas',
+      url: '/created',
+    },
+  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // Note: I'm using state to show active item.
-  // IRL you should use the url/router.
+  const pathname = usePathname()
   const [activeItem, setActiveItem] = React.useState(data.apps[0])
-
   const { setOpen } = useSidebar()
+
+  const activeBgColor = '#065F4614'
 
   return (
     <Sidebar
@@ -54,9 +59,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="overflow-hidden *:data-[sidebar=sidebar]:flex-row"
       {...props}
     >
-      {/* This is the first sidebar */}
-      {/* We disable collapsible and adjust width to icon. */}
-      {/* This will make the sidebar appear as icons. */}
       <Sidebar collapsible="none" className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r">
         <SidebarHeader>
           <SidebarMenu>
@@ -77,54 +79,73 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
+
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.apps.map(item => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={{
-                        children: item.title,
-                        hidden: false,
-                      }}
-                      onClick={() => {
-                        setActiveItem(item)
-
-                        setOpen(true)
-                      }}
-                      isActive={activeItem?.title === item.title}
-                      className="px-2.5 md:px-2"
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {data.apps.map(item => {
+                  const isActive = pathname === item.url
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        tooltip={{ children: item.title, hidden: false }}
+                        onClick={() => {
+                          setActiveItem(item)
+                          setOpen(true)
+                        }}
+                        isActive={isActive}
+                        className="px-2.5 md:px-2"
+                        style={isActive ? { backgroundColor: activeBgColor } : undefined}
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+
         <SidebarFooter>
           <NavFooter user={data.user} />
         </SidebarFooter>
       </Sidebar>
 
-      {/* This is the second sidebar */}
-      {/* We disable collapsible and let it fill remaining space */}
       <Sidebar collapsible="none" className="hidden flex-1 md:flex">
         <SidebarHeader className="py-4.5 border-b">
           <div className="flex w-full items-center justify-between my-auto">
             <div className="text-foreground text-base font-medium">{activeItem?.title}</div>
           </div>
-          {/* <SidebarInput placeholder="Type to search..." /> */}
         </SidebarHeader>
+
         <SidebarContent>
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
-              <SidebarContent>
-                <NavItems appName="App Name" items={data.navApps} />
-              </SidebarContent>
+              <SidebarMenu>
+                {data.navApps.map(item => {
+                  const isActive = pathname === item.url
+                  return (
+                    <SidebarMenuItem key={item.name}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        className="w-full justify-start px-4"
+                        style={isActive ? { backgroundColor: activeBgColor } : undefined}
+                      >
+                        <Link href={item.url}>
+                          <item.icon
+                            className={`mr-2 h-4 w-4 ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}
+                          />
+                          {item.name}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
